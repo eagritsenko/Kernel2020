@@ -1,0 +1,25 @@
+Usage:
+-d to delete entries; if name is specified, requires surname to be specified; ignores email and phone number arguments
+-g to get entries; requieres surname to be specified; ignores email and phone number arguments
+-i to insert entry; requires surname and name to be specified
+
+-s to specify surname
+-n to specify name
+-t to specify phone number
+-e to specify email
+
+Arguments should be separated by space. Arguments should not be longer than 64. Order is not important. If option or value is specified more than once, the last one is used.
+
+Examples
+echo "-g -s Ainsworth" > /dev/path_to_device
+will set the device to return information for all entries with Ainsworth surname.
+
+echo "-d" > /dev/path_to_device
+will erase all entries.
+
+echo "-s Sur -e email -n Name -i -t 2341241242--3" > /dev/path_to_device
+Will create an entry for Sur Name with email and phone number specified or overwrite email and phone number values, should Sur Name entry already exist.
+
+You can open the device on /some/path/to/device by executing "mknod /some/path/to/device c major_number 0" where major_number is a number you can see in "tchardev device major number" row in dmesg after module is inserted into kernel.
+
+You can read from the device using "cat /some/path/to/device".
