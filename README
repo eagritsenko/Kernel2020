@@ -1,4 +1,4 @@
-Usage:
+Use:
 -d to delete entries; if name is specified, requires surname to be specified; ignores email and phone number arguments
 -g to get entries; requieres surname to be specified; ignores email and phone number arguments
 -i to insert entry; requires surname and name to be specified
