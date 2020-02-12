@@ -446,7 +446,7 @@ static ssize_t device_read(struct file *flip, char *buffer, size_t len, loff_t *
 
 /*
 * -g to get data
-* -p to put data
+* -i to isert data
 * -d to delete data
 * -s to set surname
 * -n to set name
