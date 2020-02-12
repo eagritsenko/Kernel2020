@@ -154,7 +154,7 @@ static struct phb_surname_node *get_surname_node(char *surname){
     while(*cur) {
         struct phb_surname_node *cur_snode = container_of(*cur, struct phb_surname_node, node);
         int cmp = strcmp(surname, cur_snode->surname);
-	parent = *cur;
+        parent = *cur;
         if(cmp){
             if(cmp > 0)
                 cur = &((*cur)->rb_right);
@@ -175,6 +175,7 @@ static struct phb_name_node *get_name_node(struct rb_root *name_tree, char *name
     while(*cur) {
         struct phb_name_node *cur_nnode = container_of(*cur, struct phb_name_node, node);
         int cmp = strcmp(name, cur_nnode->name);
+        parent = *cur;
         if(cmp){
             if(cmp > 0)
                 cur = &((*cur)->rb_right);
@@ -214,7 +215,7 @@ static int delete_user(char *name, char *surname){
         return -2;
     rb_erase(&(name_node->node), surname_node->name_tree_root);
     free_name_node(name_node);
-    if(!surname_node->name_tree_root->rb_node){
+    if(!(surname_node->name_tree_root->rb_node)){
         rb_erase(&(surname_node->node), &(surname_tree_root));
         free_surname_node(surname_node);
     }
@@ -524,6 +525,7 @@ static ssize_t device_write(struct file *file, const char *buffer, size_t len, l
         }
         else if(write_state == arg_option_value){
             if(cur == ' ' || cur == '\n'){
+		free_string(*cur_arg);
                 (*cur_arg) = allocate_string(arg_length + 1);
                 (*cur_arg)[arg_length] = 0;
                 copy_from_user((*cur_arg), buffer + i - arg_length, arg_length);
@@ -551,6 +553,7 @@ static ssize_t device_write(struct file *file, const char *buffer, size_t len, l
     }
     // finalise reading for states that need this
     if(write_state == arg_option_value){
+	free_string(*cur_arg);
         (*cur_arg) = allocate_string(arg_length + 1);
         (*cur_arg)[arg_length] = 0;
         copy_from_user((*cur_arg), buffer + i - arg_length, arg_length);
