@@ -40,14 +40,14 @@ static struct file_operations f_ops = {
 
 
 static char out_idle[] = "Idle\n";
-static char out_invalid_operation[] = "Requested operation is invalid\n";
-static char out_argument_too_long[] = "Argument provided is too long\n";
-static char out_specify_surname[] = "You have to specify surname\n";
-static char out_specify_name[] = "You have to specify name\n";
-static char out_surname_not_found[] = "Surname not found\n";
-static char out_name_not_found[] = "Name not found\n";
-static char out_deletion_successful[] = "Entries successfully deleted\n";
-static char out_insertion_successful[] = "Entry was successfully inserted\n";
+static char out_invalid_operation[] = "[Error.1] Requested operation is invalid\n";
+static char out_argument_too_long[] = "[Error.2] Argument provided is too long\n";
+static char out_specify_surname[] = "[Error.3] You have to specify surname\n";
+static char out_specify_name[] = "[Error.4] You have to specify name\n";
+static char out_surname_not_found[] = "[Error.5] Surname not found\n";
+static char out_name_not_found[] = "[Error.6] Name not found\n";
+static char out_deletion_successful[] = "[OK.1] Entries successfully deleted\n";
+static char out_insertion_successful[] = "[OK.2] Entry was successfully inserted\n";
 static char out_row_separator[] = "\n";
 static char out_surname_prefix[] = "Surname:\t";
 static char out_name_prefix[] = "Name:\t\t";
@@ -475,7 +475,7 @@ static ssize_t device_write(struct file *file, const char *buffer, size_t len, l
 
     // begin read supplied arguments
     if(i < len)
-        get_user(cur, buffer);
+        get_user(cur, buffer); // tchartdev -i simename -s surname -t +8883324 -e email@none.com
 
     for(; i < len && cur; i++){
         if(write_state == idle){
