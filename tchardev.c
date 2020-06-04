@@ -27,6 +27,7 @@ struct phb_surname_node
 static struct rb_root surname_tree_root = RB_ROOT;
 
 static int device_open(struct inode *, struct file *);
+static int device_flush(struct file *, void *);
 static int device_release(struct inode *, struct file *);
 static ssize_t device_read(struct file *, char *, size_t, loff_t *);
 static ssize_t device_write(struct file *, const char *, size_t, loff_t *);
@@ -36,6 +37,7 @@ static struct file_operations f_ops = {
     .write = device_write,
     .open = device_open,
     .release = device_release,
+    .flush = device_flush
 };
 
 
@@ -425,6 +427,7 @@ static void do_insert_operation(char *surname, char *name, char *email, char *ph
 
 static ssize_t device_read(struct file *flip, char *buffer, size_t len, loff_t *offset){
     ssize_t bytes_read = 0;
+    printk(KERN_DEBUG "Called device_read\n");
     char *cur = state;
 
     if(eof_reached)
@@ -594,9 +597,15 @@ static int device_open(struct inode *inode, struct file *file){
     return 0;
 }
 
-static int device_release(struct inode *inode, struct file *file){
+static int device_flush(struct file *file, void *ptr){
+    printk(KERN_DEBUG "Device flushed.\n");
     device_open_count--;
     module_put(THIS_MODULE);
+    return 0;
+}
+
+static int device_release(struct inode *inode, struct file *file){
+    printk(KERN_DEBUG "Device released.\n");
     return 0;
 }
 
