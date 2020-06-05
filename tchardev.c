@@ -57,16 +57,17 @@ static char out_email_prefix[] = "Email:\t\t";
 static char out_phone_number_prefix[] = "Phone number:\t";
 
 static bool is_dynamic_state = false;
-static bool eof_reached = false;
 static char *state = out_idle;
 static char device_open_count = 0;
 static int major_num;
+static size_t state_length =  5; // length of "Idle" including leading zero
 
 static void change_state_to_constant(char *to){
     if(is_dynamic_state)
         kfree(state);
     is_dynamic_state = false;
     state = to;
+    state_length = strlen(state);
 }
 
 static void change_state_to_dynamic(char *to){
@@ -74,6 +75,7 @@ static void change_state_to_dynamic(char *to){
         kfree(state);
     is_dynamic_state = true;
     state = to;
+    state_length = strlen(state);
 }
 
 struct row_list_node{
@@ -426,25 +428,19 @@ static void do_insert_operation(char *surname, char *name, char *email, char *ph
 }
 
 static ssize_t device_read(struct file *flip, char *buffer, size_t len, loff_t *offset){
-    ssize_t bytes_read = 0;
-    printk(KERN_DEBUG "Called device_read\n");
+    loff_t c_offset = *offset;
     char *cur = state;
-
-    if(eof_reached)
-    {
-        eof_reached = false;
+    printk(KERN_DEBUG "Called device_read\n");
+    printk(KERN_DEBUG "Offset is %lld", c_offset);
+    if(c_offset >= state_length)
         return 0;
-    }
-
-    for(; len && *cur; cur++, buffer++, bytes_read++, len--)
+    cur += c_offset;
+    for(; len && (c_offset < state_length); cur++, buffer++, c_offset++, len--)
         put_user(*cur, buffer);
 
-    if(len && (*cur == 0)){
-        put_user(0, buffer);
-	eof_reached = true;
-	bytes_read++;
-    }
-    return bytes_read;
+    len = c_offset - *offset;
+    *offset = c_offset;
+    return len;
 }
 
 /*
@@ -599,8 +595,10 @@ static int device_open(struct inode *inode, struct file *file){
 
 static int device_flush(struct file *file, void *ptr){
     printk(KERN_DEBUG "Device flushed.\n");
-    device_open_count--;
-    module_put(THIS_MODULE);
+    if(device_open_count > 0){
+    	device_open_count--;
+    	module_put(THIS_MODULE);
+    }
     return 0;
 }
 
